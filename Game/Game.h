@@ -15,5 +15,6 @@ public:
     Player* getPlayer() {  return this->player; };
     Board* getBoard() { return this->board; };
     void drawBoard();
-    int checkChanges();
+    int checkChanges(int, int);
+    void lost() { this->board->revealMines(); };
 };

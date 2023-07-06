@@ -31,12 +31,43 @@ void Board::setBoard() {
     for(int i = 0; i < this->ROW; i++) {
         for(int j = 0; j < this->COL; j++) {
             this->board[i][j] = ' ';
+            this->display[i][j] = 0;
         }
     }
 }
 
+int Board::validCell(int i, int j) {
+    return ((i >= 0 && i < this->COL) && (j >= 0 && j < this->COL)) ? 1 : 0;
+}
+
+int Board::getMines(int row, int col) {
+    int cpt = 0;
+    for (int i = row - 1; i <= row + 1; i++) {
+        for (int j = col - 1; j <= col + 1; j++) {
+            if (i == row && j == col) {
+                continue;
+            }
+            if (validCell(i, j) && this->board[i][j] == 'X') {
+                cpt++;
+            }
+        }
+    }
+    return cpt;
+}
+
 void Board::setNumbers() {
-    // TODO
+    int cpt = 0;
+    for(int i = 0; i < this->COL; i++) {
+        for(int j = 0; j < this->ROW; j++) {
+            if(this->board[i][j] == 'X') {
+                continue;
+            }
+            cpt = getMines(i, j);
+            if(cpt > 0) {
+                this->board[i][j] = '0' + cpt;
+            }
+        }
+    }
 }
 
 void Board::levelBeginner() {
@@ -50,6 +81,8 @@ void Board::levelBeginner() {
         this->display[i] = (int*)malloc(this->ROW * sizeof(int));
     }
     setBoard();
+    setMines(level);
+    setNumbers();
 }
 
 void Board::levelIntermediate() {
@@ -63,6 +96,8 @@ void Board::levelIntermediate() {
         this->display[i] = (int*)malloc(this->ROW * sizeof(int));
     }
     setBoard();
+    setMines(level);
+    setNumbers();
 }
 
 void Board::levelExpert() {
@@ -90,4 +125,84 @@ Board::Board(int level) {
         default:
             levelExpert();
     }
+}
+
+int Board::finish() {
+    for(int i = 0; i < this->COL; i++) {
+        for(int j = 0; j < this->ROW; j++) {
+            if(this->display[i][j] == 0 && this->board[i][j] != 'X') {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+void Board::drawBoard() {
+    printf("\n");
+    for(int x = 0; x < this->COL; x++) {
+        printf("+---");
+    }
+    printf("+\n");
+    for(int i = 0; i < this->COL; i++) {
+        for(int j = 0; j < this->ROW; j++) {
+            if(this->display[i][j]) {
+                printf("| %c ", this->board[i][j]);
+            } else {
+                printf("| O ");
+            }
+        }
+        printf("|\n");
+        for(int x = 0; x < this->COL; x++) {
+            printf("+---");
+        }
+        printf("+\n");
+    }
+    printf("\n");
+}
+
+// Recursively call cells from one path and then try to go in the cells
+void Board::updateBoard(int i, int j) {
+    if (board[i][j] == '*' || this->display[i][j]) {
+        return;
+    }
+    this->display[i][j] = 1;
+    if (board[i][j] == ' ') {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                int nx = i + dx;
+                int ny = j + dy;
+                if (validCell(nx, ny)) {
+                    updateBoard(nx, ny);
+                }
+            }
+        }
+    }
+    if(finish()) {
+        return;
+    }
+}
+
+void Board::revealMines() {
+    printf("\n");
+    for(int x = 0; x < this->COL; x++) {
+        printf("+---");
+    }
+    printf("+\n");
+    for(int i = 0; i < this->COL; i++) {
+        for(int j = 0; j < this->ROW; j++) {
+            if(this->board[i][j] == 'X') {
+                printf("| \033[31mX\033[0m ");
+
+            } else {
+                printf("| %c ", this->board[i][j]);
+            }
+        }
+        printf("|\n");
+        for(int x = 0; x < this->COL; x++) {
+            printf("+---");
+        }
+        printf("+\n");
+    }
+    printf("\n");
 }

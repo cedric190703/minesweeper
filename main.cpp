@@ -28,29 +28,35 @@ int main() {
         // Get the position of the player
         printf("Give the index position for the x axis :\n");
         scanf("%d", &i);
-        while(i < 0 || i > size) {
+        while(i < 0 || i >= size) {
             printf("Give a correct index position for the x axis :\n");
             scanf("%d", &i);
         }
         printf("Give the index position for the y axis :\n");
         scanf("%d", &j);
-        while(j < 0 || j > size) {
+        while(j < 0 || j >= size) {
             printf("Give a correct index position for the y axis :\n");
             scanf("%d", &j);
         }
         // Check changements
-        res = game.checkChanges();
+        res = game.checkChanges(i, j);
 
+        if(res == 2) {
+            continue;
+        } else {
+            break;
+        }
         // Draw the board
         game.drawBoard();
     }
-
+    printf("\n");
     // Display the result
     if(res) {
         printf("You just won this game.\n");
         game.drawBoard();
     } else {
-        printf("You lose this game.\n");
+        printf("\033[31mYou lose this game.\033[0m\n");
+        game.lost();
     }
 
     return 0;

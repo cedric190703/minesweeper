@@ -34,6 +34,7 @@ public:
         free(this->board);
         free(this->display);
     };
+    char getCell(int i, int j) { return this->board[i][j]; };
     void levelBeginner();
     void levelIntermediate();
     void levelExpert();
@@ -41,4 +42,10 @@ public:
     void setBoard();
     void setNumbers();
     int getSize() { return this->COL; };
+    int getMines(int i, int j);
+    int validCell(int i, int j);
+    int finish();
+    void drawBoard();
+    void updateBoard(int, int);
+    void revealMines();
 };
